@@ -20,7 +20,7 @@ A backend API built with NestJS, MongoDB, and Redis for managing books and their
 - [Node.js](https://nodejs.org/) (v16+ recommended)
 - [npm](https://www.npmjs.com/)
 - [MongoDB](https://www.mongodb.com/) (running on `localhost:27017` by default)
-- [Redis](https://redis.io/) (running on `localhost:6379` by default)
+- [Redis](https://redis.io/) (running on `localhost:6379` by default, or use your host IP if using Docker)
 - (Optional) [MongoDB Compass](https://www.mongodb.com/products/compass) for DB GUI
 
 ---
@@ -48,7 +48,13 @@ Create a `.env` file in the root directory:
 ```
 MONGO_URL=mongodb://localhost:27017/book_review
 REDIS_URL=redis://localhost:6379
+PORT=3000
 ```
+
+> **Note:**
+>
+> - If you are running Redis in Docker and your app is not in Docker, use `localhost` or your host IP for `REDIS_URL`.
+> - To find your host IP, run `ipconfig` (Windows) and use the `IPv4 Address`.
 
 ### 4. Start MongoDB and Redis
 
@@ -76,6 +82,12 @@ Or for production:
 
 ```bash
 npm run start
+```
+
+After starting, the terminal will show:
+
+```
+Swagger UI is running at: http://localhost:3000/api
 ```
 
 ---
@@ -119,6 +131,10 @@ A PowerShell script `add-books.ps1` is provided to quickly add 10 sample books:
 - The `/books` GET endpoint is cached in Redis for 60 seconds.
 - Adding a new book clears the cache.
 - If Redis is offline, the app will still work (cache is bypassed).
+- To check if caching is working:
+  1. Call `GET /books` once (should be a cache miss, data from MongoDB).
+  2. Call again (should be a cache hit, data from Redis).
+  3. Use `redis-cli keys *` to see the `books` key in Redis.
 
 ---
 
@@ -176,6 +192,9 @@ A PowerShell script `add-books.ps1` is provided to quickly add 10 sample books:
   - Ensure required fields are present in requests.
 - **Port conflicts:**
   - Change the port in `main.ts` if needed.
+- **Redis not caching:**
+  - Make sure your app and Redis are using the same host/IP and port.
+  - Use `redis-cli keys *` to check for the `books` key after a GET request.
 
 ---
 
